@@ -1,11 +1,15 @@
 #include "Context.hpp"
-#include "ts.hpp"
 #include <fstream>
 
+#include "native/require.hpp"
 #include "native/timers.hpp"
+
+#include "util/path.hpp"
+#include "util/ts.hpp"
 
 #include <console.js.h>
 #include <promise.js.h>
+#include <require.js.h>
 #include <timers.js.h>
 #include <util.js.h>
 
@@ -29,17 +33,22 @@ Context* Context::create()
 	if (!dukPrimaryHeap)
 	{
 		dukPrimaryHeap = duk_create_heap(0, 0, 0, 0, fatal); // TODO: cleanup?
+		duk_push_object(dukPrimaryHeap);
+		duk_put_global_string(dukPrimaryHeap, "global");
 	}
 	duk_push_thread_new_globalenv(dukPrimaryHeap); // TODO: cleanup?
 	duk_context* ctx = duk_get_context(dukPrimaryHeap, -1);
 	duk_push_c_function(ctx, print, 1);
 	duk_put_global_string(ctx, "print");
-	duk_push_object(ctx);
+	duk_get_global_string(dukPrimaryHeap, "global");
+	duk_xmove_top(ctx, dukPrimaryHeap, 1);
 	duk_put_global_string(ctx, "global");
-	nativeTimers(ctx);
 	Context* context = new Context(ctx);
+	nativeRequire(ctx);
+	nativeTimers(ctx);
 	context->runCode((const char*)util_js);
 	context->runCode((const char*)console_js);
+	context->runCode((const char*)require_js);
 	context->runCode((const char*)timers_js);
 	context->runCode((const char*)promise_js);
 	return context;
@@ -52,9 +61,15 @@ Context::Context(duk_context* dukContext) :
 
 bool Context::runFile(const std::string& file)
 {
-	duk_push_string(mDukContext, file.c_str());
+	std::string filename = file;
+	if (!path::isAbsolute(filename)) {
+		filename = path::resolve(file);
+	}
+	duk_push_string(mDukContext, path::dirname(filename).c_str());
+	duk_put_global_string(mDukContext, "__dirname");
+	duk_push_string(mDukContext, filename.c_str());
 	duk_put_global_string(mDukContext, "__filename");
-	std::ifstream ifs(file); // TODO: error checks for file
+	std::ifstream ifs(filename); // TODO: error checks for file
 	if (!ifs.is_open())
 	{
 		return false;
@@ -69,4 +84,9 @@ void Context::runCode(const std::string& code)
 {
 	std::string content = ts::transpile(code);
 	duk_eval_string_noresult(mDukContext, content.c_str());
+}
+
+duk_context* Context::getDukContext() const
+{
+	return mDukContext;
 }

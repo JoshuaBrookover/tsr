@@ -11,6 +11,8 @@ public:
 
 	bool runFile(const std::string& file);
 	void runCode(const std::string& code);
+
+	duk_context* getDukContext() const;
 private:
 	duk_context* mDukContext;
 };

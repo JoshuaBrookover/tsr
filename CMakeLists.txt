@@ -3,9 +3,10 @@ add_subdirectory( deps )
 add_subdirectory( tools )
 
 duk( IN ${CMAKE_CURRENT_SOURCE_DIR}/deps/typescript/typescript.js OUT typescript.duk.h NULL VARIABLE typescript_duk )
-toh( IN ${CMAKE_CURRENT_SOURCE_DIR}/src/ts.js OUT ts.js.h NULL VARIABLE ts_js )
+toh( IN ${CMAKE_CURRENT_SOURCE_DIR}/src/util/ts.js OUT ts.js.h NULL VARIABLE ts_js )
 toh( IN ${CMAKE_CURRENT_SOURCE_DIR}/src/internal/console.js OUT console.js.h NULL VARIABLE console_js )
 toh( IN ${CMAKE_CURRENT_SOURCE_DIR}/src/internal/promise.js OUT promise.js.h NULL VARIABLE promise_js )
+toh( IN ${CMAKE_CURRENT_SOURCE_DIR}/src/internal/require.js OUT require.js.h NULL VARIABLE require_js )
 toh( IN ${CMAKE_CURRENT_SOURCE_DIR}/src/internal/timers.js OUT timers.js.h NULL VARIABLE timers_js )
 toh( IN ${CMAKE_CURRENT_SOURCE_DIR}/src/internal/util.js OUT util.js.h NULL VARIABLE util_js )
 add_executable(
@@ -13,14 +14,17 @@ add_executable(
 	typescript.duk.h
 	ts.js.h
 	console.js.h
+	require.js.h
 	promise.js.h
 	timers.js.h
 	util.js.h
 	src/main.cpp
-	src/ts.cpp
-	src/ts.duk.cpp
 	src/Context.cpp
+	src/native/require.cpp
 	src/native/timers.cpp
+	src/util/path.cpp
+	src/util/ts.cpp
+	src/util/ts.duk.cpp
 )
 target_link_libraries( tsr PUBLIC duktape uv_a )
-target_include_directories( tsr PUBLIC ${CMAKE_CURRENT_BINARY_DIR} )
+target_include_directories( tsr PUBLIC ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/src )
