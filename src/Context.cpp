@@ -2,6 +2,10 @@
 #include "ts.hpp"
 #include <fstream>
 
+#include "native/timers.hpp"
+
+#include <timers.js.h>
+
 static duk_context* dukPrimaryHeap = nullptr;
 
 static duk_ret_t print(duk_context *ctx)
@@ -27,7 +31,10 @@ Context* Context::create()
 	duk_context* ctx = duk_get_context(dukPrimaryHeap, -1);
 	duk_push_c_function(ctx, print, 1);
 	duk_put_global_string(ctx, "print");
-	return new Context(ctx);
+	nativeTimers(ctx);
+	Context* context = new Context(ctx);
+	context->runCode((const char*)timers_js);
+	return context;
 }
 
 Context::Context(duk_context* dukContext) :
