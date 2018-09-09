@@ -1,3 +1,3 @@
-print('Hello world!');
-print('This file: ' + __filename);
-print('Random: ' + Math.random());
+console.log('Hello world!');
+console.log('This file: ' + __filename);
+console.log('Random: ' + Math.random());

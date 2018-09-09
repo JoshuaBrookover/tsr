@@ -14,5 +14,5 @@ let people = [
 	new Person('Jimmy', 8)
 ];
 for (let person of people) {
-	print(person.name + ' is ' + person.age + ' years old');
+	console.log(person.name + ' is ' + person.age + ' years old');
 }

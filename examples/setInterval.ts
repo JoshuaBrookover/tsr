@@ -1,7 +1,7 @@
 let i = 5;
-print(i);
+console.log(i);
 let timer = setInterval(() => {
-	print(--i);
+	console.log(--i);
 	if (i == 0) {
 		clearInterval(timer);
 	}
