@@ -4,8 +4,10 @@
 
 #include "native/timers.hpp"
 
-#include <timers.js.h>
+#include <console.js.h>
 #include <promise.js.h>
+#include <timers.js.h>
+#include <util.js.h>
 
 static duk_context* dukPrimaryHeap = nullptr;
 
@@ -32,8 +34,12 @@ Context* Context::create()
 	duk_context* ctx = duk_get_context(dukPrimaryHeap, -1);
 	duk_push_c_function(ctx, print, 1);
 	duk_put_global_string(ctx, "print");
+	duk_push_object(ctx);
+	duk_put_global_string(ctx, "global");
 	nativeTimers(ctx);
 	Context* context = new Context(ctx);
+	context->runCode((const char*)util_js);
+	context->runCode((const char*)console_js);
 	context->runCode((const char*)timers_js);
 	context->runCode((const char*)promise_js);
 	return context;
