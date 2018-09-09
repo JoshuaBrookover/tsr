@@ -1,2 +1,2 @@
-let b = require('./b');
+import * as b from './b';
 b.b = 636;
