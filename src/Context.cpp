@@ -7,11 +7,11 @@
 #include "util/path.hpp"
 #include "util/ts.hpp"
 
-#include <console.js.h>
-#include <promise.js.h>
-#include <require.js.h>
-#include <timers.js.h>
-#include <util.js.h>
+#include <console.duk.h>
+#include <promise.duk.h>
+#include <require.duk.h>
+#include <timers.duk.h>
+#include <util.duk.h>
 
 static duk_context* dukPrimaryHeap = nullptr;
 
@@ -46,11 +46,11 @@ Context* Context::create()
 	Context* context = new Context(ctx);
 	nativeRequire(ctx);
 	nativeTimers(ctx);
-	context->runCode((const char*)util_js);
-	context->runCode((const char*)console_js);
-	context->runCode((const char*)require_js);
-	context->runCode((const char*)timers_js);
-	context->runCode((const char*)promise_js);
+	context->runPrecompiled(util_duk, util_duk_len);
+	context->runPrecompiled(console_duk, console_duk_len);
+	context->runPrecompiled(require_duk, require_duk_len);
+	context->runPrecompiled(timers_duk, timers_duk_len);
+	context->runPrecompiled(promise_duk, promise_duk_len);
 	return context;
 }
 
@@ -84,6 +84,15 @@ void Context::runCode(const std::string& code)
 {
 	std::string content = ts::transpile(code);
 	duk_eval_string_noresult(mDukContext, content.c_str());
+}
+
+void Context::runPrecompiled(const unsigned char* buffer, unsigned int len)
+{
+	void *pp;
+	pp = duk_push_buffer(mDukContext, len, 0);
+	memcpy(pp, buffer, len);
+	duk_load_function(mDukContext);
+	duk_call(mDukContext, 0);
 }
 
 duk_context* Context::getDukContext() const

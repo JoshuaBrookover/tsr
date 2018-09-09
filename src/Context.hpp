@@ -11,6 +11,7 @@ public:
 
 	bool runFile(const std::string& file);
 	void runCode(const std::string& code);
+	void runPrecompiled(const unsigned char* buffer, unsigned int len);
 
 	duk_context* getDukContext() const;
 private:
