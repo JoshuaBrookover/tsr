@@ -9,6 +9,7 @@ toh( IN ${CMAKE_CURRENT_SOURCE_DIR}/src/internal/promise.js OUT promise.js.h NUL
 toh( IN ${CMAKE_CURRENT_SOURCE_DIR}/src/internal/require.js OUT require.js.h NULL VARIABLE require_js )
 toh( IN ${CMAKE_CURRENT_SOURCE_DIR}/src/internal/timers.js OUT timers.js.h NULL VARIABLE timers_js )
 toh( IN ${CMAKE_CURRENT_SOURCE_DIR}/src/internal/util.js OUT util.js.h NULL VARIABLE util_js )
+toh( IN ${CMAKE_CURRENT_SOURCE_DIR}/src/modules/path.ts OUT path.ts.h NULL VARIABLE path_ts )
 add_executable(
 	tsr
 	typescript.duk.h
@@ -18,6 +19,7 @@ add_executable(
 	promise.js.h
 	timers.js.h
 	util.js.h
+	path.ts.h
 	src/main.cpp
 	src/Context.cpp
 	src/native/require.cpp
